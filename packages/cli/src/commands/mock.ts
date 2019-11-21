@@ -64,4 +64,3 @@ function coerceRange(input: string) {
 }
 
 export default mockCommand;
-
