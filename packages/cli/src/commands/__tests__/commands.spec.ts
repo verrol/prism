@@ -71,3 +71,30 @@ describe.each<{ 0: string; 1: string; 2: unknown }>([
     expect(createMultiProcessPrism).toHaveBeenLastCalledWith(expect.objectContaining({ errors: true }));
   });
 });
+
+describe('callback configuration', () => {
+  test(`starts mock server with callback defaults`, () => {
+    parser.parse(`mock /path/to`);
+    expect(createSingleProcessPrism).toHaveBeenLastCalledWith(expect.objectContaining({ callbackDelay: 0, callbackCount: 1 }));
+  });
+
+  test(`starts mock server with callback delay`, () => {
+    parser.parse(`mock --callback-delay=1 /path/to`);
+    expect(createSingleProcessPrism).toHaveBeenLastCalledWith(expect.objectContaining({ callbackDelay: 1 }));
+  });
+
+  test(`starts mock server with callback delay range`, () => {
+    parser.parse(`mock --callback-delay=1-5 /path/to`);
+    expect(createSingleProcessPrism).toHaveBeenLastCalledWith(expect.objectContaining({ callbackDelay: [1, 5] }));
+  });
+
+  test(`starts mock server with callback count`, () => {
+    parser.parse(`mock --callback-count=10 /path/to`);
+    expect(createSingleProcessPrism).toHaveBeenLastCalledWith(expect.objectContaining({ callbackCount: 10 }));
+  });
+
+  test(`starts mock server with callback count range`, () => {
+    parser.parse(`mock --callback-count=1-10 /path/to`);
+    expect(createSingleProcessPrism).toHaveBeenLastCalledWith(expect.objectContaining({ callbackCount: [1, 10] }));
+  });
+});

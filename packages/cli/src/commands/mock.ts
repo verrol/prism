@@ -1,5 +1,4 @@
 import { CommandModule } from 'yargs';
-import { RangeOrNumber } from '@stoplight/prism-core';
 import { CreateMockServerOptions, createMultiProcessPrism, createSingleProcessPrism } from '../util/createServer';
 import sharedOptions from './sharedOptions';
 import { runPrismAndSetupWatcher } from '../util/runner';
