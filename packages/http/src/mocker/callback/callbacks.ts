@@ -30,7 +30,7 @@ export function scheduleCallback({
   config: Pick<IHttpOperationConfig, 'callbackDelay' | 'callbackCount'>
 }) {
   return withLogger(logger => {
-    let executionsLeft = reduceRange(config.callbackCount);
+    let executionsLeft = reduceRange(config.callbackCount || 1);
 
     const execute = () => {
       if (executionsLeft > 0) {
@@ -39,7 +39,7 @@ export function scheduleCallback({
 
           runCallback({ callback, request, response })(logger)()
             .finally(execute);
-        }, reduceRange(config.callbackDelay) * 1000);
+        }, reduceRange(config.callbackDelay || 0) * 1000);
       }
     };
 

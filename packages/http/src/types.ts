@@ -11,8 +11,8 @@ export interface IHttpOperationConfig {
   code?: string;
   exampleKey?: string;
   dynamic: boolean;
-  callbackDelay: RangeOrNumber;
-  callbackCount: RangeOrNumber;
+  callbackDelay?: RangeOrNumber;
+  callbackCount?: RangeOrNumber;
 }
 
 export interface IHttpConfig extends IPrismConfig {

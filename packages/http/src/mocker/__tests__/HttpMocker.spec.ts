@@ -7,10 +7,10 @@ import * as JSONSchemaGenerator from '../../mocker/generator/JSONSchema';
 import { IHttpRequest, JSONSchema } from '../../types';
 import helpers from '../negotiator/NegotiatorHelpers';
 import { assertRight } from '@stoplight/prism-core/src/__tests__/utils';
-import { runCallback } from '../callback/callbacks';
+import { scheduleCallback } from '../callback/callbacks';
 
 jest.mock('../callback/callbacks', () => ({
-  runCallback: jest.fn(() => () => () => undefined),
+  scheduleCallback: jest.fn(() => () => () => undefined),
 }));
 
 const logger = createLogger('TEST', { enabled: false });
@@ -167,12 +167,12 @@ describe('mocker', () => {
         })(logger);
 
         assertRight(response, result => {
-          expect(runCallback).toHaveBeenCalledTimes(2);
-          expect(runCallback).toHaveBeenNthCalledWith(
+          expect(scheduleCallback).toHaveBeenCalledTimes(2);
+          expect(scheduleCallback).toHaveBeenNthCalledWith(
             1,
             expect.objectContaining({ callback: expect.objectContaining({ callbackName: 'c1' }) })
           );
-          expect(runCallback).toHaveBeenNthCalledWith(
+          expect(scheduleCallback).toHaveBeenNthCalledWith(
             2,
             expect.objectContaining({ callback: expect.objectContaining({ callbackName: 'c2' }) })
           );
