@@ -1,4 +1,4 @@
-import { IPrism, IPrismComponents, IPrismConfig } from '@stoplight/prism-core';
+import { IPrism, IPrismComponents, IPrismConfig, RangeOrNumber } from '@stoplight/prism-core';
 import { Dictionary, HttpMethod, IHttpOperation, INodeExample, INodeExternalExample } from '@stoplight/types';
 import { JSONSchema4, JSONSchema6, JSONSchema7 } from 'json-schema';
 
@@ -11,6 +11,8 @@ export interface IHttpOperationConfig {
   code?: string;
   exampleKey?: string;
   dynamic: boolean;
+  callbackDelay: RangeOrNumber;
+  callbackCount: RangeOrNumber;
 }
 
 export interface IHttpConfig extends IPrismConfig {

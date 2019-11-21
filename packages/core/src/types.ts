@@ -90,3 +90,5 @@ export class ProblemJsonError extends Error {
     Error.captureStackTrace(this, ProblemJsonError);
   }
 }
+
+export type RangeOrNumber = [number, number] | number;

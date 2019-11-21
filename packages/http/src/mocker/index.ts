@@ -24,7 +24,7 @@ import { UNAUTHORIZED, UNPROCESSABLE_ENTITY } from './errors';
 import { generate, generateStatic } from './generator/JSONSchema';
 import helpers from './negotiator/NegotiatorHelpers';
 import { IHttpNegotiationResult } from './negotiator/types';
-import { runCallback } from './callback/callbacks';
+import { scheduleCallback } from './callback/callbacks';
 
 const mock: IPrismComponents<IHttpOperation, IHttpRequest, IHttpResponse, IMockHttpConfig>['mock'] = ({
   resource,
@@ -53,7 +53,7 @@ const mock: IPrismComponents<IHttpOperation, IHttpRequest, IHttpResponse, IMockH
       withLogger(logger =>
         pipe(
           response,
-          Either.map(response => runCallbacks({ resource, request: input.data, response })(logger)),
+          Either.map(response => scheduleCallbacks({ resource, request: input.data, response, config })(logger)),
           Either.chain(() => response)
         )
       )
@@ -61,14 +61,16 @@ const mock: IPrismComponents<IHttpOperation, IHttpRequest, IHttpResponse, IMockH
   );
 };
 
-function runCallbacks({
+function scheduleCallbacks({
   resource,
   request,
   response,
+  config,
 }: {
   resource: IHttpOperation;
   request: IHttpRequest;
   response: IHttpResponse;
+  config: Pick<IHttpOperationConfig, 'callbackDelay' | 'callbackCount'>;
 }) {
   return withLogger(logger =>
     pipe(
@@ -76,7 +78,7 @@ function runCallbacks({
       Option.map(callbacks =>
         pipe(
           callbacks,
-          map(callback => runCallback({ callback, request, response })(logger)())
+          map(callback => scheduleCallback({ callback, request, response, config })(logger))
         )
       )
     )

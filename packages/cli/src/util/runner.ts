@@ -2,11 +2,11 @@ import { getHttpOperationsFromResource } from '@stoplight/prism-http';
 import { IPrismHttpServer } from '@stoplight/prism-http-server/src/types';
 import * as chokidar from 'chokidar';
 import * as os from 'os';
-import { CreateMockServerOptions } from './createServer';
+import { CreateBaseServerOptions } from './createServer';
 
-type CreatePrism = (options: CreateMockServerOptions) => Promise<IPrismHttpServer | void>;
+type CreatePrism = (options: CreateBaseServerOptions) => Promise<IPrismHttpServer | void>;
 
-export function runPrismAndSetupWatcher(createPrism: CreatePrism, options: CreateMockServerOptions) {
+export function runPrismAndSetupWatcher(createPrism: CreatePrism, options: CreateBaseServerOptions) {
   return createPrism(options).then(possiblyServer => {
     if (possiblyServer) {
       let server: IPrismHttpServer = possiblyServer;

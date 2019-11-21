@@ -1,4 +1,4 @@
-import { createLogger } from '@stoplight/prism-core';
+import { createLogger, RangeOrNumber } from '@stoplight/prism-core';
 import { IHttpConfig, IHttpProxyConfig, getHttpOperationsFromResource } from '@stoplight/prism-http';
 import { createServer as createHttpServer } from '@stoplight/prism-http-server';
 import chalk from 'chalk';
@@ -75,7 +75,15 @@ async function createPrismServerWithLogger(options: CreateBaseServerOptions, log
 
   const config: IHttpProxyConfig | IHttpConfig = isProxyServerOptions(options)
     ? { ...shared, mock: false, upstream: options.upstream }
-    : { ...shared, mock: { dynamic: options.dynamic } };
+    : {
+        ...shared,
+        mock: {
+          dynamic: options.dynamic,
+
+          callbackDelay: (options as CreateMockServerOptions).callbackDelay,
+          callbackCount: (options as CreateMockServerOptions).callbackCount,
+        },
+      };
 
   const server = createHttpServer(operations, {
     cors: options.cors,
@@ -122,7 +130,7 @@ function isProxyServerOptions(options: CreateBaseServerOptions): options is Crea
   return 'upstream' in options;
 }
 
-type CreateBaseServerOptions = {
+export type CreateBaseServerOptions = {
   dynamic: boolean;
   cors: boolean;
   host: string;
@@ -137,6 +145,9 @@ export interface CreateProxyServerOptions extends CreateBaseServerOptions {
   upstream: URL;
 }
 
-export type CreateMockServerOptions = CreateBaseServerOptions;
+export interface CreateMockServerOptions extends CreateBaseServerOptions {
+  callbackDelay: RangeOrNumber;
+  callbackCount: RangeOrNumber;
+}
 
 export { createMultiProcessPrism, createSingleProcessPrism };
