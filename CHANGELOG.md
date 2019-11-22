@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 # Unreleased
 
+# 3.2.0 (2019-11-21)
+
 ## Added
 
 - Support for encoding > allowReserved flag when validating application/x-www-form-urlencoded body [#630](https://github.com/stoplightio/prism/pull/630)
