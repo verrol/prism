@@ -143,11 +143,11 @@ export type CreateBaseServerOptions = {
 export type CreateProxyServerOptions = CreateBaseServerOptions & {
   dynamic: false;
   upstream: URL;
-}
+};
 
 export type CreateMockServerOptions = CreateBaseServerOptions & {
   callbackDelay: RangeOrNumber;
   callbackCount: RangeOrNumber;
-}
+};
 
 export { createMultiProcessPrism, createSingleProcessPrism };
