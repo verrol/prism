@@ -28,7 +28,7 @@ describe('scheduleCallback()', () => {
   describe('1 second delay is specified', () => {
     it('runs callback after 1 second', () => {
       scheduleCallback({
-        config: { callbackDelay: 1 },
+        config: { callbackDelay: 1000 },
         response: {} as any,
         request: {} as any,
         callback: {} as any,
@@ -43,14 +43,14 @@ describe('scheduleCallback()', () => {
   describe('delay range is specified', () => {
     it('runs callback within given delay', () => {
       scheduleCallback({
-        config: { callbackDelay: [1, 10] },
+        config: { callbackDelay: [1000, 10000] },
         response: {} as any,
         request: {} as any,
         callback: {} as any,
       } )({} as any);
 
       expect(runCallback).not.toHaveBeenCalled();
-      jest.advanceTimersByTime(10 * 1000);
+      jest.advanceTimersByTime(10000);
       expect(runCallback).toHaveBeenCalledTimes(1);
     });
   });
@@ -82,7 +82,7 @@ describe('scheduleCallback()', () => {
   describe('count range and delay range is specified', () => {
     it('runs callback both within given ranges of count and delay', async () => {
       scheduleCallback({
-        config: { callbackCount: [3, 3], callbackDelay: [1, 10] },
+        config: { callbackCount: [3, 3], callbackDelay: [1000, 10000] },
         response: {} as any,
         request: {} as any,
         callback: {} as any,
@@ -90,13 +90,13 @@ describe('scheduleCallback()', () => {
 
       expect(runCallback).not.toHaveBeenCalled();
 
-      jest.advanceTimersByTime(10 * 1000);
+      jest.advanceTimersByTime(10000);
       await Promise.resolve();
 
-      jest.advanceTimersByTime(10 * 1000);
+      jest.advanceTimersByTime(10000);
       await Promise.resolve();
 
-      jest.advanceTimersByTime(10 * 1000);
+      jest.advanceTimersByTime(10000);
       await Promise.resolve();
 
       // I don't have idea how to make jest expect number of calls being a range

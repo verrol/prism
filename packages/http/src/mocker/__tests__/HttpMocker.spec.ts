@@ -9,7 +9,7 @@ import helpers from '../negotiator/NegotiatorHelpers';
 import { assertRight } from '@stoplight/prism-core/src/__tests__/utils';
 import { scheduleCallback } from '../callback/scheduler';
 
-jest.mock('../callback/callbacks', () => ({
+jest.mock('../callback/scheduler', () => ({
   scheduleCallback: jest.fn(() => () => () => undefined),
 }));
 

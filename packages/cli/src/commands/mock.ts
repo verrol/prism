@@ -2,6 +2,7 @@ import { CommandModule } from 'yargs';
 import { CreateMockServerOptions, createMultiProcessPrism, createSingleProcessPrism } from '../util/createServer';
 import sharedOptions from './sharedOptions';
 import { runPrismAndSetupWatcher } from '../util/runner';
+import { RangeOrNumber } from '@stoplight/prism-core';
 
 const mockCommand: CommandModule = {
   describe: 'Start a mock server with the given document file',
@@ -24,7 +25,7 @@ const mockCommand: CommandModule = {
           description: 'Number of seconds to wait before executing callbacks',
           default: '0',
           string: true,
-          coerce: coerceRange,
+          coerce: (input: string) => toMillis(coerceRange(input)),
         },
         ['callback-count']: {
           description: 'How many times a callback should be executed',
@@ -53,13 +54,19 @@ const mockCommand: CommandModule = {
   },
 };
 
-function coerceRange(input: string) {
+function coerceRange(input: string): RangeOrNumber {
   const matches = /^([0-9]+)(-([0-9]+))?$/.exec(input);
   if (!matches) {
     throw new Error(`Cannot parse range: ${input}`);
   }
 
-  return matches[3] ? [parseInt(matches[1], 10), parseInt(matches[3], 10)].sort() : parseInt(matches[1], 10);
+  return matches[3]
+    ? ([parseInt(matches[1], 10), parseInt(matches[3], 10)].sort() as [number, number])
+    : parseInt(matches[1], 10);
+}
+
+function toMillis(input: RangeOrNumber) {
+  return typeof input === 'number' ? input * 1000 : input.map(r => r * 1000);
 }
 
 export default mockCommand;

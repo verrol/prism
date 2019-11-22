@@ -80,12 +80,12 @@ describe('callback configuration', () => {
 
   test(`starts mock server with callback delay`, () => {
     parser.parse(`mock --callback-delay=1 /path/to`);
-    expect(createSingleProcessPrism).toHaveBeenLastCalledWith(expect.objectContaining({ callbackDelay: 1 }));
+    expect(createSingleProcessPrism).toHaveBeenLastCalledWith(expect.objectContaining({ callbackDelay: 1000 }));
   });
 
   test(`starts mock server with callback delay range`, () => {
     parser.parse(`mock --callback-delay=1-5 /path/to`);
-    expect(createSingleProcessPrism).toHaveBeenLastCalledWith(expect.objectContaining({ callbackDelay: [1, 5] }));
+    expect(createSingleProcessPrism).toHaveBeenLastCalledWith(expect.objectContaining({ callbackDelay: [1000, 5000] }));
   });
 
   test(`starts mock server with callback count`, () => {

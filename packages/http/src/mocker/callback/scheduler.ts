@@ -27,7 +27,7 @@ export function scheduleCallback({
 
           runCallback({ callback, request, response })(logger)()
             .finally(execute);
-        }, reduceRange(config.callbackDelay || 0) * 1000);
+        }, reduceRange(config.callbackDelay || 0));
       }
     };
 
