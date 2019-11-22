@@ -21,13 +21,13 @@ const mockCommand: CommandModule = {
           boolean: true,
           default: false,
         },
-        ['callback-delay']: {
+        'callback-delay': {
           description: 'Number of seconds to wait before executing callbacks',
           default: '0',
           string: true,
           coerce: (input: string) => toMillis(coerceRange(input)),
         },
-        ['callback-count']: {
+        'callback-count': {
           description: 'How many times a callback should be executed',
           default: '1',
           string: true,
