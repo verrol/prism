@@ -46,7 +46,7 @@ There is no need to manually stop and start a Prism server after a change to a s
 In case of removing all of the operations in a document, Prism will not be reloaded.
 In such a case, Prism will keep serving operations loaded with the previous restart.
 
-## Modifying Responses
+### Modifying Responses
 
 #### Force Response Status
 
@@ -79,6 +79,24 @@ You can override the `--dynamic|-d` CLI param (which decides whether the generat
 ```bash
 curl -v http://127.0.0.1:4010/pets/123?__dynamic=false
 ```
+
+### Advanced Callback configuration
+
+By default, a callback is executed once and immediately after making the base endpoint call. There are two options to override that behavior and make Prism act in a more realistic way.
+
+- `--callback-count` - specifies a count of times a callback should be executed
+- `--callback-delay` - defines a time (in seconds) to wait before executing a callback
+
+Both values can be either exact or specified as a range. Once specified as a range, the actual value will be randomized to fit into that range.
+
+#### Example 
+
+```bash
+prism mock --callback-delay=5-10 --callback-count=3 https://raw.githubusercontent.com/stoplightio/prism/master/examples/callbacks/payment-service.oas3.yaml
+```
+
+The above example configures callbacks to be executed always `3` times with a random delay within `5` and `10` seconds.
+
 
 ## Proxy
 
