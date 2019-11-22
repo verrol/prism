@@ -140,12 +140,12 @@ export type CreateBaseServerOptions = {
   errors: boolean;
 };
 
-export interface CreateProxyServerOptions extends CreateBaseServerOptions {
+export type CreateProxyServerOptions = CreateBaseServerOptions & {
   dynamic: false;
   upstream: URL;
 }
 
-export interface CreateMockServerOptions extends CreateBaseServerOptions {
+export type CreateMockServerOptions = CreateBaseServerOptions & {
   callbackDelay: RangeOrNumber;
   callbackCount: RangeOrNumber;
 }
