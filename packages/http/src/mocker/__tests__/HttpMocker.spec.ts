@@ -7,7 +7,7 @@ import * as JSONSchemaGenerator from '../../mocker/generator/JSONSchema';
 import { IHttpRequest, JSONSchema } from '../../types';
 import helpers from '../negotiator/NegotiatorHelpers';
 import { assertRight } from '@stoplight/prism-core/src/__tests__/utils';
-import { scheduleCallback } from '../callback/callbacks';
+import { scheduleCallback } from '../callback/scheduler';
 
 jest.mock('../callback/callbacks', () => ({
   scheduleCallback: jest.fn(() => () => () => undefined),

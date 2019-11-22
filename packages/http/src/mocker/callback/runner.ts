@@ -9,43 +9,13 @@ import { head } from 'fp-ts/lib/Array';
 import { pipe } from 'fp-ts/lib/pipeable';
 
 import { resolveRuntimeExpressions } from '../../utils/runtimeExpression';
-import { IHttpOperationConfig, IHttpRequest, IHttpResponse } from '../../types';
+import { IHttpRequest, IHttpResponse } from '../../types';
 import { generate as generateHttpParam } from '../generator/HttpParamGenerator';
 import { validateOutput } from '../../validator';
 import { parseResponse } from '../../utils/parseResponse';
 import withLogger from '../../withLogger';
 import { violationLogger } from '../../utils/logger';
 import { Logger } from 'pino';
-import { RangeOrNumber } from '@stoplight/prism-core';
-
-export function scheduleCallback({
-  callback,
-  request,
-  response,
-  config,
-}: {
-  callback: IHttpCallbackOperation;
-  request: IHttpRequest;
-  response: IHttpResponse;
-  config: Pick<IHttpOperationConfig, 'callbackDelay' | 'callbackCount'>
-}) {
-  return withLogger(logger => {
-    let executionsLeft = reduceRange(config.callbackCount || 1);
-
-    const execute = () => {
-      if (executionsLeft > 0) {
-        setTimeout(() => {
-          executionsLeft--;
-
-          runCallback({ callback, request, response })(logger)()
-            .finally(execute);
-        }, reduceRange(config.callbackDelay || 0) * 1000);
-      }
-    };
-
-    execute();
-  });
-}
 
 export function runCallback({
   callback,
@@ -155,14 +125,5 @@ function assembleHeaders(
       ),
       (mediaTypeHeader, headers) => ({ ...headers, ...mediaTypeHeader })
     )
-  );
-}
-
-function reduceRange(rangeOrNumber: RangeOrNumber): number {
-  return pipe(
-    rangeOrNumber,
-    Option.fromPredicate(Array.isArray),
-    Option.map(range => range[0] + Math.round(Math.random() * (range[1] - range[0]))),
-    Option.getOrElse(() => rangeOrNumber as number),
   );
 }

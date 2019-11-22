@@ -24,7 +24,7 @@ import { UNAUTHORIZED, UNPROCESSABLE_ENTITY } from './errors';
 import { generate, generateStatic } from './generator/JSONSchema';
 import helpers from './negotiator/NegotiatorHelpers';
 import { IHttpNegotiationResult } from './negotiator/types';
-import { scheduleCallback } from './callback/callbacks';
+import { scheduleCallback } from './callback/scheduler';
 
 const mock: IPrismComponents<IHttpOperation, IHttpRequest, IHttpResponse, IMockHttpConfig>['mock'] = ({
   resource,

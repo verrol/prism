@@ -1,5 +1,5 @@
 import fetch from 'node-fetch';
-import { runCallback } from '../callbacks';
+import { runCallback } from '../runner';
 import { mapValues } from 'lodash';
 import { HttpParamStyles } from '@stoplight/types';
 
