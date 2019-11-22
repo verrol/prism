@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 # Unreleased
 
+## Added
+
+- Support for advanced callbacks configuration [#833](https://github.com/stoplightio/prism/pull/833)
+
 # 3.2.0 (2019-11-21)
 
 ## Added
