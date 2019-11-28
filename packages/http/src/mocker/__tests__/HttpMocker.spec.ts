@@ -178,6 +178,73 @@ describe('mocker', () => {
           );
         });
       });
+
+      describe('body is url encoded', () => {
+        it('runs callback with deserialized body', () => {
+          const callbacksMockResource: IHttpOperation = {
+            ...mockResource,
+            request: {
+              body: {
+                contents: [
+                  {
+                    mediaType: 'application/x-www-form-urlencoded',
+                    schema: {
+                      type: 'object',
+                      properties: {
+                        param1: { type: 'string' },
+                        param2: { type: 'string' },
+                      }
+                    }
+                  }
+                ]
+              }
+            },
+            callbacks: [
+              {
+                callbackName: 'callback',
+                method: 'get',
+                path: 'http://example.com/notify',
+                id: '1',
+                responses: [{ code: '200', contents: [{ mediaType: 'application/json' }] }],
+              },
+            ],
+          };
+
+          jest.spyOn(helpers, 'negotiateOptionsForValidRequest').mockReturnValue(
+            right({
+              code: '202',
+              mediaType: 'test',
+              schema: callbacksMockResource.responses[0].contents![0].schema,
+              headers: [],
+            })
+          );
+
+          const response = mock({
+            config: { dynamic: true },
+            resource: callbacksMockResource,
+            input: {
+              ...mockInput,
+              data: {
+                ...mockInput.data,
+                body: 'param1=test1&param2=test2',
+                headers: {
+                  ...mockInput.data.headers,
+                  'content-type': 'application/x-www-form-urlencoded',
+                },
+              },
+            },
+          })(logger);
+
+          assertRight(response, () => {
+            expect(runCallback).toHaveBeenCalledWith(expect.objectContaining({ request: expect.objectContaining({
+              body: {
+                param1: 'test1',
+                param2: 'test2',
+              }
+            }) }));
+          });
+        });
+      });
     });
 
     describe('with a negotiator response containing validation results of Warning severity', () => {

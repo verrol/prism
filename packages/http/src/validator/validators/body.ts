@@ -12,7 +12,7 @@ import { IHttpValidator } from './types';
 import { validateAgainstSchema } from './utils';
 import { fromArray } from 'fp-ts/lib/NonEmptyArray';
 
-function deserializeFormBody(
+export function deserializeFormBody(
   schema: JSONSchema,
   encodings: IHttpEncoding[],
   decodedUriParams: Dictionary<string, string>
@@ -40,7 +40,7 @@ function deserializeFormBody(
   );
 }
 
-function splitUriParams(target: string) {
+export function splitUriParams(target: string) {
   return target.split('&').reduce((result: Dictionary<string, string>, pair: string) => {
     const [key, ...rest] = pair.split('=');
     result[key] = rest.join('=');
@@ -48,14 +48,14 @@ function splitUriParams(target: string) {
   }, {});
 }
 
-function decodeUriEntities(target: Dictionary<string, string>) {
+export function decodeUriEntities(target: Dictionary<string, string>) {
   return Object.entries(target).reduce((result, [k, v]) => {
     result[decodeURIComponent(k)] = decodeURIComponent(v);
     return result;
   }, {});
 }
 
-function findContentByMediaTypeOrFirst(specs: IMediaTypeContent[], mediaType: string) {
+export function findContentByMediaTypeOrFirst(specs: IMediaTypeContent[], mediaType: string) {
   return pipe(
     specs,
     Array.findFirst(spec => spec.mediaType === mediaType),
@@ -68,7 +68,7 @@ function validateBodyIfNotFormEncoded(mediaType: string, schema: JSONSchema, tar
   return pipe(
     mediaType,
     Option.fromPredicate(mt => !typeIs.is(mt, ['application/x-www-form-urlencoded'])),
-    Option.map(() => validateAgainstSchema(target, schema))
+    Option.chain(() => validateAgainstSchema(target, schema))
   );
 }
 
@@ -80,7 +80,10 @@ function deserializeAndValidate(content: IMediaTypeContent, schema: JSONSchema, 
     validateAgainstReservedCharacters(encodedUriParams, encodings),
     Either.map(decodeUriEntities),
     Either.map(decodedUriEntities => deserializeFormBody(schema, encodings, decodedUriEntities)),
-    Either.fold(e => Option.some(e), deserialised => Option.some(validateAgainstSchema(deserialised, schema)))
+    Either.fold(
+      e => Option.some(e),
+      deserialised => validateAgainstSchema(deserialised, schema)
+    )
   );
 }
 

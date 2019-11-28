@@ -1,5 +1,12 @@
 import { IPrismComponents, IPrismInput } from '@stoplight/prism-core';
-import { DiagnosticSeverity, Dictionary, IHttpHeaderParam, IHttpOperation, INodeExample } from '@stoplight/types';
+import {
+  DiagnosticSeverity,
+  Dictionary,
+  IHttpHeaderParam,
+  IHttpOperation,
+  INodeExample,
+  IMediaTypeContent,
+} from '@stoplight/types';
 
 import * as caseless from 'caseless';
 import * as Either from 'fp-ts/lib/Either';
@@ -8,8 +15,9 @@ import * as Reader from 'fp-ts/lib/Reader';
 import * as Option from 'fp-ts/lib/Option';
 import * as ReaderEither from 'fp-ts/lib/ReaderEither';
 import { map } from 'fp-ts/lib/Array';
-import { isEmpty, isObject, keyBy, mapValues, groupBy } from 'lodash';
+import { isEmpty, isObject, keyBy, mapValues, groupBy, get } from 'lodash';
 import { Logger } from 'pino';
+import * as typeIs from 'type-is';
 import {
   ContentExample,
   IHttpOperationConfig,
@@ -25,6 +33,12 @@ import { generate, generateStatic } from './generator/JSONSchema';
 import helpers from './negotiator/NegotiatorHelpers';
 import { IHttpNegotiationResult } from './negotiator/types';
 import { scheduleCallback } from './callback/scheduler';
+import {
+  decodeUriEntities,
+  deserializeFormBody,
+  findContentByMediaTypeOrFirst,
+  splitUriParams,
+} from '../validator/validators/body';
 
 const mock: IPrismComponents<IHttpOperation, IHttpRequest, IHttpResponse, IMockHttpConfig>['mock'] = ({
   resource,
@@ -78,11 +92,52 @@ function scheduleCallbacks({
       Option.map(callbacks =>
         pipe(
           callbacks,
-          map(callback => scheduleCallback({ callback, request, response, config })(logger))
+          map(callback =>
+            scheduleCallback({ callback, request: parseBodyIfUrlEncoded(request, resource), response })(logger)()
+          )
         )
       )
     )
   );
+}
+
+/*
+  This function should not be here at all, but unfortunately due to some limitations of the Monad we're using (Either)
+  we cannot carry parsed informations in case of an error — which is what we do need instead.
+*/
+function parseBodyIfUrlEncoded(request: IHttpRequest, resource: IHttpOperation) {
+  const mediaType = caseless(request.headers || {}).get('content-type');
+  if (!mediaType) return request;
+
+  if (!typeIs.is(mediaType, ['application/x-www-form-urlencoded'])) return request;
+
+  const specs = pipe(
+    Option.fromNullable(resource.request),
+    Option.mapNullable(request => request.body),
+    Option.mapNullable(body => body.contents),
+    Option.getOrElse(() => [] as IMediaTypeContent[])
+  );
+
+  const encodedUriParams = splitUriParams(request.body as string);
+
+  if (specs.length < 1) {
+    return Object.assign(request, { body: encodedUriParams });
+  }
+
+  const content = pipe(
+    Option.fromNullable(mediaType),
+    Option.chain(mediaType => findContentByMediaTypeOrFirst(specs, mediaType)),
+    Option.map(({ content }) => content),
+    Option.getOrElse(() => specs[0] || {})
+  );
+
+  const encodings = get(content, 'encodings', []);
+
+  if (!content.schema) return Object.assign(request, { body: encodedUriParams });
+
+  return Object.assign(request, {
+    body: deserializeFormBody(content.schema, encodings, decodeUriEntities(encodedUriParams)),
+  });
 }
 
 function handleInputValidation(input: IPrismInput<IHttpRequest>, resource: IHttpOperation) {
